@@ -22,3 +22,15 @@ A Python-based Smart Grid Management System designed to simulate electricity dis
 - **GUI**: Tkinter
 - **Algorithm**: Dijkstra’s Algorithm (networkx optional)
 - **Data Handling**: Custom dictionaries and logic (optional: SQLite/MySQL for persistence)
+
+
+## 📁 Project Structure
+
+smart-grid-management/
+│
+├── main.py              # Entry point
+├── gui.py               # GUI layout and event handlers
+├── graph_logic.py       # Core logic: graph structure, Dijkstra, load balancing
+├── utils.py             # (Optional) Helper functions
+├── assets/              # Images, icons, etc.
+├── README.md            # Project documentation
