@@ -4,7 +4,6 @@ from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "smart_grid.db")
 
-
 def init_db():
     """Create all tables if they don't already exist."""
     conn = sqlite3.connect(DB_PATH)
@@ -15,7 +14,8 @@ def init_db():
             timestamp TEXT,
             from_node TEXT,
             to_node   TEXT,
-            weight    INTEGER
+            weight    INTEGER,
+            max_capacity INTEGER DEFAULT 1000
         )
     """)
     c.execute("""
@@ -39,20 +39,17 @@ def init_db():
     conn.commit()
     conn.close()
 
-
 def _ts():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-
-def save_edge(from_node, to_node, weight):
+def save_edge(from_node, to_node, weight, max_capacity=1000):
     conn = sqlite3.connect(DB_PATH)
     conn.execute(
-        "INSERT INTO edges (timestamp, from_node, to_node, weight) VALUES (?, ?, ?, ?)",
-        (_ts(), from_node, to_node, weight),
+        "INSERT INTO edges (timestamp, from_node, to_node, weight, max_capacity) VALUES (?, ?, ?, ?, ?)",
+        (_ts(), from_node, to_node, weight, max_capacity),
     )
     conn.commit()
     conn.close()
-
 
 def save_node(node, role, capacity):
     conn = sqlite3.connect(DB_PATH)
@@ -67,7 +64,6 @@ def save_node(node, role, capacity):
     conn.commit()
     conn.close()
 
-
 def save_load_balancing(allocation_paths):
     conn = sqlite3.connect(DB_PATH)
     ts = _ts()
@@ -78,36 +74,41 @@ def save_load_balancing(allocation_paths):
     conn.commit()
     conn.close()
 
-
 def load_edges():
     """Return all edges stored in the database."""
     conn = sqlite3.connect(DB_PATH)
-    rows = conn.execute(
-        "SELECT from_node, to_node, weight FROM edges"
-    ).fetchall()
+    try:
+        rows = conn.execute(
+            "SELECT from_node, to_node, weight, max_capacity FROM edges"
+        ).fetchall()
+    except sqlite3.OperationalError:
+        rows = []
     conn.close()
     return rows
-
 
 def load_nodes():
     """Return latest state of every node stored in the database."""
     conn = sqlite3.connect(DB_PATH)
-    rows = conn.execute(
-        "SELECT node, role, capacity FROM nodes"
-    ).fetchall()
+    try:
+        rows = conn.execute(
+            "SELECT node, role, capacity FROM nodes"
+        ).fetchall()
+    except sqlite3.OperationalError:
+        rows = []
     conn.close()
     return rows
-
 
 def get_load_balancing_history(limit=50):
     conn = sqlite3.connect(DB_PATH)
-    rows = conn.execute(
-        "SELECT timestamp, from_node, to_node, amount FROM load_balancing ORDER BY id DESC LIMIT ?",
-        (limit,),
-    ).fetchall()
+    try:
+        rows = conn.execute(
+            "SELECT timestamp, from_node, to_node, amount FROM load_balancing ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    except sqlite3.OperationalError:
+        rows = []
     conn.close()
     return rows
-
 
 def clear_all():
     """Wipe all tables — used by 'Reset Grid' button."""

@@ -8,25 +8,25 @@ EDGE_FILE = os.path.join(LOG_DIR, "edges.csv")
 NODE_FILE = os.path.join(LOG_DIR, "nodes.csv")
 LOAD_FILE = os.path.join(LOG_DIR, "load_balancing.csv")
 
-# Ensure the log directory exists
 os.makedirs(LOG_DIR, exist_ok=True)
 
-# Helper function to get the current timestamp formatted
 def get_timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-def log_edge(from_node, to_node, weight):
+def log_edge(from_node, to_node, weight, max_capacity=1000):
     with open(EDGE_FILE, "a", newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([get_timestamp(), from_node, to_node, weight])
+        writer.writerow([get_timestamp(), from_node, to_node, weight, max_capacity])
 
 def log_bulk_edges(lines):
     with open(EDGE_FILE, "a", newline='') as file:
         writer = csv.writer(file)
         for line in lines:
             tokens = line.split()
-            if len(tokens) >= 3:
-                writer.writerow([get_timestamp()] + tokens[:3])
+            if len(tokens) >= 4:
+                writer.writerow([get_timestamp()] + tokens[:4])
+            elif len(tokens) >= 3:
+                writer.writerow([get_timestamp()] + tokens[:3] + [1000])
 
 def log_node_role(node, role, capacity):
     with open(NODE_FILE, "a", newline='') as file:

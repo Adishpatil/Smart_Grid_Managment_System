@@ -1,11 +1,11 @@
-import tkinter as tk
+import ttkbootstrap as tb
 from gui import SmartGridVisualizer
- 
+
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Smart Grid Management System")
-    root.geometry("1150x760")
-    root.minsize(900, 600)
-    SmartGridVisualizer(root)
+    # Use ttkbootstrap for a modern, flat UI
+    root = tb.Window(themename="darkly")
+    root.title("Smart City Energy Grid Management System")
+    root.geometry("1200x800")
+    root.minsize(1000, 700)
+    app = SmartGridVisualizer(root)
     root.mainloop()
- 
